@@ -1,0 +1,25 @@
+name: Sync NewNow Fork
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天凌晨运行一次
+  workflow_dispatch: # 支持手动触发
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整的提交历史
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - name: Add upstream remote
+        run: git remote add upstream https://github.com/ourongxing/newsnow.git
+      - name: Fetch upstream changes
+        run: git fetch upstream
+      - name: Merge upstream changes
+        run: |
+          git checkout main
+          git merge upstream/main --allow-unrelated-histories
+          git push origin main
